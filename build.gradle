@@ -1,0 +1,74 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.3'
+    id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+    id 'java'
+}
+ext {
+    buildTag = project.hasProperty("buildTag") ? project.getProperty("buildTag") : 'canary'
+    publishImage = project.hasProperty("publishImage") ? project.getProperty("publishImage") : false
+    harborUserName = project.hasProperty("harborUserName") ? project.getProperty("harborUserName") : "unknown"
+    harborUserPass = project.hasProperty("harborUserPass") ? project.getProperty("harborUserPass") : "unknown"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    //rabbitmq
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
+    //mongodb
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    //html template
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.session:spring-session-core'
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    //jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.amqp:spring-rabbit-test'
+}
+
+bootBuildImage {
+    imageName = "harbor.linecorp.com/word-mafia/word-mafia-game-server:${buildTag}"
+    publish = publishImage
+    builder = "docker-hub-mirror.linecorp.com/paketobuildpacks/builder:0.1.192-base"
+    runImage = "docker-hub-mirror.linecorp.com/paketobuildpacks/run:base-cnb"
+    docker {
+        publishRegistry {
+            username = "${harborUserName}"
+            password = "${harborUserPass}"
+            url = "harbor.linecorp.com/word-mafia/"
+        }
+    }
+}
+tasks.named('test') {
+    useJUnitPlatform()
+}

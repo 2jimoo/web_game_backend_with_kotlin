@@ -1,0 +1,25 @@
+spring:
+  rabbitmq:
+    host: 10.128.169.175
+    port: 5672
+    username: guest
+    password: guest
+  #    template:
+  #     mandatory: true
+  #     publisher-confirm-type: correlated #simple, none
+  #     publisher-returns: true
+  #    RabbitTemplate.setConfirmCallback :송신 성공/실패시 콜백
+  #    RabbitTemplate.setReturnCallback: 메세지 반환된 경우 콜백
+  #    listener:
+  #      simple:
+  #        acknowledge-mode: manual
+  data:
+    mongodb:
+      authentication-database: admin
+      port: 27017
+      database: dev
+      host: 10.128.177.237
+      username: admin
+      password: admin
+server:
+  port: 8090 # test
